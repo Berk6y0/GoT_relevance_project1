@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author Yiğit
+ * @author Berkay
  */
 public class SeparateChainHash<Item> {
 
