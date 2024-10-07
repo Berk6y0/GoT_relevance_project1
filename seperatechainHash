@@ -1,0 +1,321 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package project3;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Scanner;
+
+/**
+ *
+ * @author Yiğit
+ */
+public class SeparateChainHash<Item> {
+
+    int M;
+    LinkedList<Item>[] table;
+
+    /**
+     * @param args the command line arguments
+     */
+    public SeparateChainHash(int M) {
+        table = new LinkedList[M];
+        for (int ix = 0; ix < M; ix++) {
+            table[ix] = new LinkedList<Item>();
+        }
+        this.M = M;
+    }
+
+    public int hash(Item t) {
+        return ((t.hashCode() & 0x7ffffff) % M);
+    }
+
+    public void insert(Item t) {
+        int ix = hash(t);
+        //System.out.println("hash index: "+ix);
+
+        // must check if it is there first.
+        //if(!table[ix].contains(t))
+        table[ix].insertFirst(t);
+        //System.out.println(ix+"th chain: "+table[ix]);
+    }
+
+    public String toString() {
+        String s = "";
+        for (int ix = 0; ix < M; ix++) {
+            if (table[ix] != null ) {
+                if(table[ix].size!= 0){
+                s += ix + "th " + table[ix].toString() + "\n";
+                }
+            }
+        }
+        return s;
+    }
+
+    public class LinkedList<Item> {
+
+        Node<Item> first, last;
+        int size = 0;
+
+        public LinkedList() {
+            first = null;
+            last = null;
+            size = 0;
+        }
+
+        /**
+         * @param args the command line arguments
+         */
+
+        // prints the list
+        public String toString() {
+            Node tmp = first;
+            String str = "List with " + size + " elements: ";
+
+            while (tmp != null) {
+
+                if (size != 0) {
+                    str += tmp.toString() + "->";
+                    tmp = tmp.next;
+                }
+                if(size==0){
+                 tmp = tmp.next;   
+                }
+            }
+            if (size != 0) {
+                str += ".";
+            }
+            //str +="\nfirst: "+first.toString()+ " last: "+last.toString();
+            return str;
+        }
+
+        public void insertFirst(Item x) {
+            Node newNode = new Node<Item>(x);
+            if (first == null) {
+                first = newNode;
+                last = newNode;
+            } else {
+                newNode.next = first;
+                first = newNode;
+            }
+            size++;
+        }
+
+        public void insertAfter(Node<Item> p, Item x) {
+            Node<Item> newNode = new Node<Item>(x);
+            if (p == null || size == 0) {
+
+                return;
+            }
+            if (p == last) {
+                insertLast(x);
+                return;
+            }
+            newNode.next = p.next;
+            p.next = newNode;
+            size++;
+        }
+
+        public void insertLast(Item x) {
+            Node newNode = new Node(x);
+            if (first == null) {
+                first = newNode;
+                last = newNode;
+            } else {
+                last.next = newNode;
+                last = newNode;
+            }
+            size++;
+        }
+
+        public boolean isEmpty() {
+            return size == 0;
+        }
+
+        public Node removeFirst() {
+            if (isEmpty()) {
+                return null;
+            }
+            Node tmp = first;
+            first = first.next;
+            size--;
+            return tmp;
+        }
+    }
+
+    public static GraphMatrix readGraphFromFile() throws FileNotFoundException {// returnlerken grapf  returnlicek graph2=graph1 yapcaz aşağıda
+        SeparateChainHash<String> s0 = new SeparateChainHash<>(1000);
+        GraphMatrix g2 = new GraphMatrix(1000);
+        File file = new File("D:\\GoT.txt");
+
+        Scanner sc = new Scanner(file);
+
+        while (sc.hasNextLine()) {
+
+            String Line = sc.nextLine();
+            String[] place = Line.split(",");
+
+            s0.insert(place[0]);
+            s0.insert(place[1]);
+            int weight = Integer.parseInt(place[2]);
+
+            g2.addEdge(place[0], place[1], weight);
+            g2.addEdge(place[1], place[0], weight);// undirected
+            g2.GotNames[g2.hash1(place[0])] = place[0];
+            g2.GotNames[g2.hash1(place[1])] = place[1];
+        }
+        System.out.println(s0.toString());
+        System.out.println(g2.toString());
+        return g2;
+
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        GraphMatrix g1 = readGraphFromFile();
+//                SeparateChainHash<String> s0 = new SeparateChainHash<>(1000);
+//                
+//        GraphMatrix g1 = new GraphMatrix(1000);
+//        File file = new File("C:\\Users\\Berkay BADANOZ\\Desktop\\GoT.txt");
+//
+//        Scanner sc1 = new Scanner(file);
+//
+//        while (sc1.hasNextLine()) {
+//           
+//            String Line = sc1.nextLine();
+//            String[] place = Line.split(",");
+//             
+//        
+//            s0.insert(place[0]);
+//           
+//            
+//            s0.insert(place[1]);
+//            
+//            int weight=Integer.parseInt(place[2]);
+//        g1.GotNames[g1.hash1(place[0])] = place[0];
+//                g1.GotNames[g1.hash1(place[1])] = place[1];
+//
+//
+//                        g1.addEdge(place[0], place[1],weight);
+//                        g1.addEdge(place[1], place[0], weight);
+//        }
+
+//*****************************************************************************************************************************************************************
+//     
+//        GraphMatrix g1 = new GraphMatrix(50);
+//        g1.addEdge("ali", "zehra", 1);
+//        g1.addEdge("ali", "veli", 4);
+//        g1.addEdge("zehra", "sara", 1);
+//        g1.addEdge("sara", "ali", 3);
+//        g1.addEdge("aynaz", "taymaz", 1);
+//        g1.addEdge("aynaz", "solmaz", 1);
+//        g1.addEdge("ece", "solmaz", 2);
+//        g1.addEdge("ece", "taymaz", 7);
+//        g1.addEdge("sevgi", "sina", 2);
+//        g1.addEdge("sina", "rahim", 2);
+//        g1.addEdge("zehra", "ali", 1);
+//        g1.addEdge("veli", "ali", 4);
+//        g1.addEdge("sara", "zehra", 1);
+//        g1.addEdge("ali", "sara", 3);
+//        g1.addEdge("taymaz", "aynaz", 1);
+//        g1.addEdge("solmaz", "aynaz", 1);
+//        g1.addEdge("solmaz", "ece", 2);
+//        g1.addEdge("taymaz", "ece", 7);
+//        g1.addEdge("sina", "sevgi", 2);
+//        g1.addEdge("rahim", "sina", 2);
+//is there a path ve  no of path bence bu ödev için  uygun değil hocayla  konuş
+//*******************************************************************************************************************************
+        String menu = "(Press 1)IsThereAPath\n"
+                + "(Press 2) AllPathsShorterThanEqualTo \n"
+                + "(Press 3) ShortestPathLengthFromTo\n"
+                + "(Press 4)NoOfPathsFromTo\n"
+                + "(Press 5) BFSfromTo\n"
+                + "(Press 6)DFSfromTo\n"
+                + "(Press 7)NoOfVerticesInComponent\n"
+                + "(Press 8)Exit\n";
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println(menu);
+        int u = 0;
+        while (u != 8) {
+            u = sc.nextInt();
+            switch (u) {
+                case 1:
+                    System.out.println("Please enter the name1 and name2");
+                    String name1 = sc.next();
+                    String name2 = sc.next();
+                    System.out.println(g1.IsThereAPath(name1, name2));
+
+                    break;
+                case 2:
+                    System.out.println("Please enter the PathLength");
+                    int a = sc.nextInt();
+                    System.out.println("Please enter the VertexNo");
+                    int b = sc.nextInt();
+                    System.out.println("Please enter the start name ");
+                    String name81 = sc.next();
+                    g1.allPathsShorterThanEqualTo(a, b, name81);
+                    break;
+
+                case 3:
+                    System.out.println("Please enter the name1 and name2");
+                    String name3 = sc.next();
+                    String name4 = sc.next();
+                    if (g1.IsThereAPath(name3, name4) == true) {
+                        System.out.println(g1.ShortestPathLength(name3, name4));
+                    } else {
+                        System.out.println("infinity");
+                    }
+
+                    break;
+                case 4:
+                    System.out.println("Please enter the name1 and name2");
+                    String name5 = sc.next();
+                    String name6 = sc.next();
+                    System.out.println(g1.NoOfPathsFromTo(name5, name6));
+
+                    break;
+                case 5:
+                    System.out.println("Please enter the name1 and name2");
+                    String name7 = sc.next();
+                    String name8 = sc.next();
+                    if (g1.IsThereAPath(name7, name8) == true) {
+                        g1.BFS(name7, name8);
+                    } else {
+                        System.out.println("No Path");
+                    }
+
+                    break;
+                case 6:
+                    System.out.println("Please enter the name1 and name2");
+                    String name9 = sc.next();
+                    String name10 = sc.next();
+                    if (g1.IsThereAPath(name9, name10) == true) {
+                        g1.DFS(name9, name10);
+                    } else {
+                        System.out.println("No Path");
+                    }
+
+                    break;
+                case 7:
+                    System.out.println("Please enter the name1");
+                    String name11 = sc.next();
+                    g1.noOfVerticesInComponent(name11);
+
+                    break;
+
+            }
+            if (u == 8) {
+                System.out.println("Exiting the program ….");
+
+            }
+
+        }
+
+    }
+
+}
